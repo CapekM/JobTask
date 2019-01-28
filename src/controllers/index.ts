@@ -1,6 +1,6 @@
-import {PingController} from './ping';
-import { MonitoredEndpointController } from './monitoredEndpoint';
-import { MonitoreingResultController } from './monitoringResult';
+import {PingController} from "./ping";
+import { MonitoredEndpointController } from "./monitoredEndpoint";
+import { MonitoreingResultController } from "./monitoringResult";
 
 export const CONTROLLERS = [
     new MonitoreingResultController(),

@@ -1,13 +1,16 @@
 {
-  "name": "MyTypeormProject",
+  "name": "endpoint_monitoring",
   "version": "0.0.1",
   "description": "Awesome project developed with TypeORM.",
   "devDependencies": {
-    "@types/node": "^8.0.29",
-    "ts-node": "3.3.0",
+    "@types/node": "^8.10.39",
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "mocha": "^5.2.0",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.12.1",
     "tslint-config-airbnb": "^5.11.1",
-    "tslint-config-prettier": "^1.17.0",
-    "typescript": "2.5.2",
+    "typescript": "^2.9.2",
     "typescript-tslint-plugin": "^0.3.0"
   },
   "dependencies": {
@@ -20,7 +23,9 @@
     "request": "^2.88.0"
   },
   "scripts": {
+    "devdep": "npm install typescript ts-node tslint typescript-tslint-plugin tslint-config-airbnb @types/node mocha chai chai-http --save-dev",
     "start": "ts-node src/index.ts",
+    "test": "mocha --require ts-node/register test/**/*.ts",
     "dev": "nodemon src/index.ts"
   }
 }

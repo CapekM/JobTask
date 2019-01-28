@@ -1,7 +1,7 @@
-import { getRepository, DeleteResult } from 'typeorm';
-import { MonitoringResult } from '../entity/MonitoringResult';
-import { MonitoredEndpoint } from '../entity/MonitoredEndpoint';
-import * as request from 'request';
+import { getRepository, DeleteResult } from "typeorm";
+import { MonitoringResult } from "../entity/MonitoringResult";
+import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
+import * as request from "request";
 
 export class MonitoringResultService {
 
@@ -23,7 +23,7 @@ export class MonitoringResultService {
               time : true,
               method : monitoredEndpoint.type,
             },  async (err, res, body) => {
-              console.log('Request time in ms', res.elapsedTime);
+              console.log("Request time in ms", res.elapsedTime);
               newMonitoringResult.statusCode = res.statusCode;
               newMonitoringResult.returnedPlayload = body;
               newMonitoringResult.monitoredInterval = Math.ceil(res.elapsedTime / 1000);

@@ -1,15 +1,15 @@
-import {Controller} from './controller';
-import {HttpServer} from '../server/httpServer';
-import {Request, Response} from 'restify';
-import { monitoredEndpointService } from '../services/monitoredEndpoint';
+import {Controller} from "./controller";
+import {HttpServer} from "../server/httpServer";
+import {Request, Response} from "restify";
+import { monitoredEndpointService } from "../services/monitoredEndpoint";
 
 export class MonitoredEndpointController implements Controller {
     public initialize(httpServer: HttpServer): void {
-        httpServer.get('endpoints', this.list.bind(this));
-        httpServer.get('endpoint/:id', this.getById.bind(this));
-        httpServer.post('endpoint', this.create.bind(this));
-        httpServer.put('endpoint/:id', this.update.bind(this));
-        httpServer.del('endpoint/:id', this.remove.bind(this));
+        httpServer.get("endpoints", this.list.bind(this));
+        httpServer.get("endpoint/:id", this.getById.bind(this));
+        httpServer.post("endpoint", this.create.bind(this));
+        httpServer.put("endpoint/:id", this.update.bind(this));
+        httpServer.del("endpoint/:id", this.remove.bind(this));
     }
 
     private async list(req: Request, res: Response): Promise<void> {

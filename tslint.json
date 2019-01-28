@@ -12,7 +12,9 @@
       "only-arrow-functions": [true, "allow-declarations", "allow-named-functions"],
       "no-boolean-literal-compare": true,
       "indent": [true, "spaces", 4],
-      "ter-indent": [true, 4]
+      "ter-indent": [true, 4],
+      "quotemark": [true, "double", "avoid-escape"],
+      "space-within-parens": [false]
     },
     "rulesDirectory": []
   }

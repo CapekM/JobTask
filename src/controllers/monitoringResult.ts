@@ -1,16 +1,16 @@
-import {Controller} from './controller';
-import {HttpServer} from '../server/httpServer';
-import {Request, Response} from 'restify';
-import { getRepository } from 'typeorm';
-import { MonitoredEndpoint } from '../entity/MonitoredEndpoint';
-import { monitoringResultService } from '../services/monitoringResult';
+import {Controller} from "./controller";
+import {HttpServer} from "../server/httpServer";
+import {Request, Response} from "restify";
+import { getRepository } from "typeorm";
+import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
+import { monitoringResultService } from "../services/monitoringResult";
 
 export class MonitoreingResultController implements Controller {
     public initialize(httpServer: HttpServer): void {
-        httpServer.get('results', this.list.bind(this));
-        httpServer.get('result/:id', this.getById.bind(this));
-        httpServer.post('result', this.create.bind(this));
-        httpServer.del('result/:id', this.remove.bind(this));
+        httpServer.get("results", this.list.bind(this));
+        httpServer.get("result/:id", this.getById.bind(this));
+        httpServer.post("result", this.create.bind(this));
+        httpServer.del("result/:id", this.remove.bind(this));
     }
 
     private async list(req: Request, res: Response): Promise<void> {
@@ -23,7 +23,7 @@ export class MonitoreingResultController implements Controller {
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        const match: string = (typeof req.body.url !== 'undefined' && req.body.url)
+        const match: string = (typeof req.body.url !== "undefined" && req.body.url)
         ? req.body.url : req.body.name;
         const endpoints = await getRepository(MonitoredEndpoint).find();
         let entity: MonitoredEndpoint;

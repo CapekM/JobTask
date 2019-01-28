@@ -1,5 +1,5 @@
-import { MonitoredEndpoint } from '../entity/MonitoredEndpoint';
-import { getRepository, DeleteResult } from 'typeorm';
+import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
+import { getRepository, DeleteResult } from "typeorm";
 
 export class MonitoredEndpointService {
 

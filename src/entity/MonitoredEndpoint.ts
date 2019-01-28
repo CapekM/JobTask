@@ -1,13 +1,13 @@
 // tslint:disable-next-line: max-line-length
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany} from 'typeorm';
-import { User } from './User';
-import { MonitoringResult } from './MonitoringResult';
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany} from "typeorm";
+import { User } from "./User";
+import { MonitoringResult } from "./MonitoringResult";
 
 export enum requestType {
-    GET = 'GET',
-    POST = 'POST',
-    PUT = 'PUT',
-    DEL = 'DELETE',
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    DEL = "DELETE",
 }
 
 @Entity()

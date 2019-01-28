@@ -1,5 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne} from 'typeorm';
-import { MonitoredEndpoint } from './MonitoredEndpoint';
+import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne} from "typeorm";
+import { MonitoredEndpoint } from "./MonitoredEndpoint";
 
 @Entity()
 export class MonitoringResult {
@@ -10,13 +10,13 @@ export class MonitoringResult {
     @CreateDateColumn()
     date: Date;
 
-    @Column('integer')
+    @Column("integer")
     statusCode: number;
 
     @Column()
     returnedPlayload: string;
 
-    @Column('integer')
+    @Column("integer")
     monitoredInterval: number;
 
     @ManyToOne(type => MonitoredEndpoint, monitoredEndpoint => monitoredEndpoint.monitoringResults)
