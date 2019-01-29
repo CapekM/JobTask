@@ -22,7 +22,8 @@ export class MonitoredEndpointController implements Controller {
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        res.send(await monitoredEndpointService.create(req.body));
+        const entity = await monitoredEndpointService.create(req.body);
+        res.send(entity ? 200 : 404, entity);
     }
 
     private async update(req: Request, res: Response): Promise<void> {

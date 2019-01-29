@@ -13,6 +13,9 @@ export class MonitoredEndpointService {
 
     public async create(entity: MonitoredEndpoint): Promise<MonitoredEndpoint> {
         // Normally DTO !== DB-Entity, so we "simulate" a mapping of both
+        if (entity.name === "" || entity.url === "") {
+            return null;
+        }
         const newEndpoint = new MonitoredEndpoint();
         newEndpoint.name = entity.name;
         newEndpoint.url = entity.url;

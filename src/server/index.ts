@@ -31,7 +31,7 @@ export class ApiServer implements HttpServer {
         this.addControllers();
 
         this.server.listen(port);
-        console.log(`Server is up & running on port ${port}`);
+        // console.log(`Server is up & running on port ${port}`);
     }
 
 // tslint:disable-next-line: max-line-length
@@ -44,7 +44,7 @@ export class ApiServer implements HttpServer {
                 res.send(500, e);
             }
         });
-        console.log(`Added route ${method.toUpperCase()} ${url}`);
+        // console.log(`Added route ${method.toUpperCase()} ${url}`);
     }
 
     private addControllers(): void {

@@ -16,13 +16,19 @@ export class MonitoredEndpoint {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({
+        default: "",
+    })
     name: string;
 
-    @Column()
+    @Column({
+        default: "",
+    })
     url: string;
 
-    @Column()
+    @Column({
+        default: requestType.GET,
+    })
     type: requestType;
 
     @CreateDateColumn()
