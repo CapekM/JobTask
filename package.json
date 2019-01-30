@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Awesome project developed with TypeORM.",
   "devDependencies": {
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/node": "^8.10.39",
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
@@ -20,7 +21,10 @@
     "@types/restify": "^5.0.3",
     "nodemon": "^1.12.1",
     "restify": "^6.0.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "jsonwebtoken": "^0.2.0",
+    "restify-jwt-community": "^1.0.9",
+    "dotenv": "^6.2.0"
   },
   "scripts": {
     "devdep": "npm install typescript ts-node tslint typescript-tslint-plugin tslint-config-airbnb @types/node mocha chai chai-http --save-dev",

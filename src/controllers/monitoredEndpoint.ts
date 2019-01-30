@@ -1,6 +1,6 @@
-import {Controller} from "./controller";
-import {HttpServer} from "../server/httpServer";
-import {Request, Response} from "restify";
+import { Controller } from "./controller";
+import { HttpServer } from "../server/httpServer";
+import { Request, Response } from "restify";
 import { monitoredEndpointService } from "../services/monitoredEndpoint";
 
 export class MonitoredEndpointController implements Controller {
@@ -27,7 +27,7 @@ export class MonitoredEndpointController implements Controller {
     }
 
     private async update(req: Request, res: Response): Promise<void> {
-        res.send(await monitoredEndpointService.update({...req.body, id: req.params.id}));
+        res.send(await monitoredEndpointService.update({ ...req.body, id: req.params.id }));
     }
 
     private async remove(req: Request, res: Response): Promise<void> {

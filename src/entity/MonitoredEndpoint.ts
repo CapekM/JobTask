@@ -1,5 +1,5 @@
 // tslint:disable-next-line: max-line-length
-import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from "typeorm";
 import { User } from "./User";
 import { MonitoringResult } from "./MonitoringResult";
 
