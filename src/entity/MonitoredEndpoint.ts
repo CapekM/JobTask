@@ -37,7 +37,9 @@ export class MonitoredEndpoint {
     @UpdateDateColumn()
     lastCheckDate: Date;
 
-    @ManyToOne(type => User, user => user.monitoredEndpoints)
+    @ManyToOne(type => User, user => user.monitoredEndpoints, {
+        eager: true,
+    })
     user: User;
 
     @OneToMany(type => MonitoringResult, monitoringResults => monitoringResults.monitoredEndpoint)
