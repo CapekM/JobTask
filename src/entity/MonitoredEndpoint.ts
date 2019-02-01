@@ -39,6 +39,7 @@ export class MonitoredEndpoint {
 
     @ManyToOne(type => User, user => user.monitoredEndpoints, {
         eager: true,
+        onDelete: "CASCADE",
     })
     user: User;
 
