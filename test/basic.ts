@@ -9,6 +9,7 @@ import { createBasicUsers, User } from "../src/entity/User";
 import { createConnection, Connection, Repository } from "typeorm";
 import { after, before } from "mocha";
 import { MonitoredEndpoint } from "../src/entity/MonitoredEndpoint";
+require("dotenv").config();
 
 chai.use( chaiHttp );
 
@@ -51,12 +52,13 @@ describe( "Users", () => {
         });
         expect( user.username ).to.equal( "Applifting" );
         expect( user.email ).to.equal( "info@applifting.cz" );
-        expect( user.accessToken ).to.equal( "040ff087-6d86-4f12-bc63-9c0a4781614a" );
     });
 });
 
-describe( "API Test", () => {
+describe( "Test API", () => {
     const server = new ApiServer();
+    let userA: string;
+    let userB: string;
 
     before( "Starting server", async () => {
         server.start(8080);
@@ -67,60 +69,123 @@ describe( "API Test", () => {
         server.server.close();
     });
 
-    describe( "Ping", () => {
-        it( "GET /ping", () => {
+    describe( "MonitoredEndpoints tests", () => {
+        it( "UserA get token", done => {
             chai.request( server.server )
-            .get( "/ping" )
-            .end( ( err, res ) => {
-                expect( res ).to.have.status( 200 );
-                expect( res.body ).to.have.eql( "hello" );
-                expect( res.body.length ).to.have.eql( 5 );
-            });
-        });
-    });
-
-    describe( "Endpoints", () => {
-        it( "POST endpoint", () => {
-            chai.request( server.server )
-            .post( "/endpoint" )
+            .post( "/auth" )
             .send({
-                name: "Star Wars API",
-                url: "https://swapi.co/api/",
+                name: "Applifting",
             })
             .end( ( err, res ) => {
                 expect( res ).to.have.status( 200 );
+                expect(res.body).to.have.property("token");
+                userA = `Bearer ${res.body.token}`;
+                chai.request( server.server )
+                .get( "/ping" )
+                .set("Authorization", userA)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    expect( res.body ).to.have.eql( "hello" );
+                    expect( res.body.length ).to.have.eql( 5 );
+                    done();
+                });
             });
         });
 
-        // it( "POST fake endpoint", () => {
-        //     chai.request( server.server )
-        //     .post( "/endpoint" )
-        //     .send({
-        //         name: "Fake",
-        //     })
-        //     .end( ( err, res ) => {
-        //         expect( res ).to.have.status( 404 );
-        //     });
-        // });
-
-        it( "GET endpoints", async () => {
+        it( "UserB get token", done => {
             chai.request( server.server )
-            .get( "/endpoints" )
-            .end( async ( err, res ) => {
-                expect( res ).to.have.status( 200 );
-                // expect( res.body ).to.have.eql( [] );
-                console.log(res.body);
-            });
-        });
-    });
-
-    describe( "Results", () => {
-        it( "GET /results", () => {
-            chai.request( server.server )
-            .get( "/results" )
+            .post( "/auth" )
+            .send({
+                name: "Batman",
+            })
             .end( ( err, res ) => {
                 expect( res ).to.have.status( 200 );
-                expect( res.body ).to.have.eql( [] );
+                expect(res.body).to.have.property("token");
+                userB = `Bearer ${res.body.token}`;
+                chai.request( server.server )
+                .get( "/ping" )
+                .set("Authorization", userB)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    expect( res.body ).to.have.eql( "hello" );
+                    expect( res.body.length ).to.have.eql( 5 );
+                    done();
+                });
+            });
+        });
+
+        describe( "MonitoredEndpoint CRUD tests", () => {
+            let endpointID: number;
+            it( "POST endpoint as userA", done => {
+                chai.request( server.server )
+                .post( "/endpoint" )
+                .set("Authorization", userA)
+                .send({
+                    name: "Star Wars API",
+                    url: "https://swapi.co/api/",
+                })
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    endpointID = res.body.id;
+                    chai.request( server.server )
+                    .get( "/endpoint/" + endpointID)
+                    .set("Authorization", userA)
+                    .end( ( err, res ) => {
+                        expect( res ).to.have.status( 200 );
+                        done();
+                    });
+                });
+            });
+
+            it( "GET endpoints as userA", done => {
+                chai.request( server.server )
+                .get( "/endpoints" )
+                .set("Authorization", userA)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    expect( res.body.length ).to.have.eql( 1 );
+                    done();
+                });
+            });
+
+            it( "GET endpoints as userB", done => {
+                chai.request( server.server )
+                .get( "/endpoints" )
+                .set("Authorization", userB)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    expect( res.body.length ).to.have.eql( 0 );
+                    done();
+                });
+            });
+
+            it( "DELETE endpoint as userB", () => {
+                chai.request( server.server )
+                .delete( "/endpoint/" + endpointID )
+                .set("Authorization", userB)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 404 );
+                });
+            });
+
+            it( "DELETE endpoint as userA", done => {
+                chai.request( server.server )
+                .delete( "/endpoint/" + endpointID )
+                .set("Authorization", userA)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    done()
+                });
+            });
+
+            it( "DELETE same endpoint as userA", done => {
+                chai.request( server.server )
+                .delete( "/endpoint/" + endpointID )
+                .set("Authorization", userA)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 500 );
+                    done();
+                });
             });
         });
     });

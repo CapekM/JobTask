@@ -15,7 +15,7 @@ export class HelpController implements Controller {
     private async auth(req: Request, res: Response): Promise<void> {
         try {
             const user = await authenticate(req.body.name);
-
+            
             const token = jwt.sign(JSON.parse(JSON.stringify(user)), process.env.JWT_SECRET, {
                 expiresIn: "1h",
             });

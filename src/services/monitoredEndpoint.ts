@@ -32,9 +32,7 @@ export class MonitoredEndpointService {
         newEndpoint.name = entity.name;
         newEndpoint.url = entity.url;
         newEndpoint.user = await getRepository(User).findOne(userID);
-        const save = await getRepository(MonitoredEndpoint).save(newEndpoint)
-        console.log(await getRepository(MonitoredEndpoint).findOne(newEndpoint.id));
-        return save;
+        return getRepository(MonitoredEndpoint).save(newEndpoint);
     }
 
     public async update(entity: MonitoredEndpoint, userID: number): Promise<[number, MonitoredEndpoint]> {
