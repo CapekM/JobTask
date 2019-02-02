@@ -23,7 +23,6 @@ export class MonitoringResultService {
               time : true,
               method : monitoredEndpoint.type,
             },  async (err, res, body) => {
-              console.log("Request time in ms", res.elapsedTime);
               newMonitoringResult.statusCode = res.statusCode;
               newMonitoringResult.returnedPlayload = body;
               newMonitoringResult.monitoredInterval = Math.ceil(res.elapsedTime / 1000);
@@ -32,8 +31,6 @@ export class MonitoringResultService {
 // tslint:enable: ter-indent
 
         await this.wait(newMonitoringResult); // using sleep to wait for response
-
-        console.log(newMonitoringResult);
 
         return getRepository(MonitoringResult).save(newMonitoringResult);
     }

@@ -19,6 +19,9 @@ export class MonitoringResult {
     @Column("integer")
     monitoredInterval: number;
 
-    @ManyToOne(type => MonitoredEndpoint, monitoredEndpoint => monitoredEndpoint.monitoringResults)
+    @ManyToOne(type => MonitoredEndpoint, monitoredEndpoint => monitoredEndpoint.monitoringResults, {
+        eager: true,
+        onDelete: "CASCADE",
+    })
     monitoredEndpoint: MonitoredEndpoint;
 }

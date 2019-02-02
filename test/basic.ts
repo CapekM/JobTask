@@ -6,9 +6,10 @@ import { expect } from "chai";
 import chaiHttp = require("chai-http");
 import { ApiServer } from "../src/server";
 import { createBasicUsers, User } from "../src/entity/User";
-import { createConnection, Connection, Repository } from "typeorm";
+import { createConnection, Connection, Repository, getRepository } from "typeorm";
 import { after, before } from "mocha";
 import { MonitoredEndpoint } from "../src/entity/MonitoredEndpoint";
+import { MonitoringResult } from "../src/entity/MonitoringResult";
 require("dotenv").config();
 
 chai.use( chaiHttp );
@@ -25,6 +26,7 @@ before( "Create connection", async () => {
 
 after( "Close connection", async () => {
     await userRepo.remove(await userRepo.find());
+    await getRepository(MonitoringResult).remove(await getRepository(MonitoringResult).find());
     connection.close();
 });
 
@@ -70,6 +72,8 @@ describe( "Test API", () => {
     });
 
     describe( "MonitoredEndpoints tests", () => {
+        let endpointID: number;
+
         it( "UserA get token", done => {
             chai.request( server.server )
             .post( "/auth" )
@@ -115,7 +119,6 @@ describe( "Test API", () => {
         });
 
         describe( "MonitoredEndpoint CRUD tests", () => {
-            let endpointID: number;
             it( "POST endpoint as userA", done => {
                 chai.request( server.server )
                 .post( "/endpoint" )
@@ -200,6 +203,49 @@ describe( "Test API", () => {
                 .set("Authorization", userA)
                 .end( ( err, res ) => {
                     expect( res ).to.have.status( 500 );
+                    done();
+                });
+            });
+        });
+        describe( "Result CRUD tests", () => {
+            const name = "Star Wars API";
+            const url = "https://swapi.co/api/";
+
+            it( "POST endpoint as userA", done => {
+                chai.request( server.server )
+                .post( "/endpoint" )
+                .set("Authorization", userA)
+                .send({
+                    name: name,
+                    url: url,
+                })
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    done();
+                });
+            });
+
+            it( "POST result as userA", done => {
+                chai.request( server.server )
+                .post( "/result" )
+                .set("Authorization", userA)
+                .send({
+                    url: url,
+                    type: "GET",
+                })
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    done();
+                });
+            });
+
+            it( "GET results as userA", done => {
+                chai.request( server.server )
+                .get( "/results" )
+                .set("Authorization", userA)
+                .end( ( err, res ) => {
+                    expect( res ).to.have.status( 200 );
+                    expect( res.body.length ).to.have.eql( 1 );
                     done();
                 });
             });
