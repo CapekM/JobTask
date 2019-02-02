@@ -208,6 +208,7 @@ describe( "Test API", () => {
             });
         });
         describe( "Result CRUD tests", () => {
+            let resultID: number;
             const name = "Star Wars API";
             const url = "https://swapi.co/api/";
 
@@ -225,28 +226,67 @@ describe( "Test API", () => {
                 });
             });
 
-            it( "POST result as userA", done => {
-                chai.request( server.server )
-                .post( "/result" )
-                .set("Authorization", userA)
-                .send({
-                    url: url,
-                    type: "GET",
-                })
-                .end( ( err, res ) => {
-                    expect( res ).to.have.status( 200 );
-                    done();
-                });
+
+            describe( "Make 12 results", () => {
+                for( let i = 12; i > 0; i--) {
+                    it( "POST result as userA", done => {
+                        chai.request( server.server )
+                        .post( "/result" )
+                        .set("Authorization", userA)
+                        .send({
+                            name: name
+                        })
+                        .end( ( err, res ) => {
+                            expect( res ).to.have.status( 200 );
+                            resultID = res.body.id;
+                            done();
+                        });
+                    });
+                }
             });
 
-            it( "GET results as userA", done => {
-                chai.request( server.server )
-                .get( "/results" )
-                .set("Authorization", userA)
-                .end( ( err, res ) => {
-                    expect( res ).to.have.status( 200 );
-                    expect( res.body.length ).to.have.eql( 1 );
-                    done();
+            describe( "Get them and delete one", () => {
+                it( "GET results as userA", done => {
+                    chai.request( server.server )
+                    .get( "/results" )
+                    .set("Authorization", userA)
+                    .end( ( err, res ) => {
+                        expect( res ).to.have.status( 200 );
+                        expect( res.body.length ).to.have.eql( 12 );
+                        done();
+                    });
+                });
+
+                it( "GET results as userB", done => {
+                    chai.request( server.server )
+                    .get( "/results" )
+                    .set("Authorization", userB)
+                    .end( ( err, res ) => {
+                        expect( res ).to.have.status( 200 );
+                        expect( res.body.length ).to.have.eql( 0 );
+                        done();
+                    });
+                });
+
+                it( "Delete result as userA", done => {
+                    chai.request( server.server )
+                    .delete( "/result/" + resultID )
+                    .set("Authorization", userA)
+                    .end( ( err, res ) => {
+                        expect( res ).to.have.status( 200 );
+                        done();
+                    });
+                });
+
+                it( "GET results from " + name + " as userA", done => {
+                    chai.request( server.server )
+                    .get( "/results/" + name )
+                    .set("Authorization", userA)
+                    .end( ( err, res ) => {
+                        expect( res ).to.have.status( 200 );
+                        expect( res.body.length ).to.have.eql( 10 );
+                        done();
+                    });
                 });
             });
         });

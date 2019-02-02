@@ -4,27 +4,28 @@ import {Request, Response} from "restify";
 import { getRepository } from "typeorm";
 import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
 import { monitoringResultService } from "../services/monitoringResult";
+import { getUserID } from "../services/auth";
 
 export class MonitoreingResultController implements Controller {
     public initialize(httpServer: HttpServer): void {
         httpServer.get("results", this.list.bind(this));
-        httpServer.get("result/:id", this.getById.bind(this));
+        httpServer.get("results/:name", this.getByName.bind(this));
         httpServer.post("result", this.create.bind(this));
         httpServer.del("result/:id", this.remove.bind(this));
     }
 
     private async list(req: Request, res: Response): Promise<void> {
-        res.send(await monitoringResultService.list());
+        res.send(await monitoringResultService.list(getUserID(req.headers.authorization)));
     }
 
-    private async getById(req: Request, res: Response): Promise<void> {
-        const entity = await monitoringResultService.getById(req.params.id);
-        res.send(entity ? 200 : 404, entity);
+    private async getByName(req: Request, res: Response): Promise<void> {
+        const message = await monitoringResultService.getByName(req.params.name, getUserID(req.headers.authorization));
+        res.send( (message[0] !== 200) ? message[0] : message[0], message[1]);
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        const match: string = (typeof req.body.url !== "undefined" && req.body.url)
-        ? req.body.url : req.body.name;
+        const match: string = (typeof req.body.name !== "undefined" && req.body.name)
+        ? req.body.name : req.body.url;
         const endpoints = await getRepository(MonitoredEndpoint).find();
         let entity: MonitoredEndpoint;
         let flag: boolean = true;
@@ -39,13 +40,16 @@ export class MonitoreingResultController implements Controller {
             res.send(500);
             return;
         }
+        if (entity.user.id !== getUserID(req.headers.authorization)) {
+            res.send(403);
+            return;
+        }
         res.send(await monitoringResultService.create(entity));
     }
 
     private async remove(req: Request, res: Response): Promise<void> {
         try {
-            await monitoringResultService.delete(req.params.id);
-            res.send(200);
+            res.send( await monitoringResultService.delete(req.params.id, getUserID(req.headers.authorization)));
         } catch (e) {
             res.send(500);
         }
