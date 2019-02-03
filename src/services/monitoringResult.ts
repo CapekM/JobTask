@@ -4,6 +4,8 @@ import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
 import * as request from "request";
 import { Request } from "restify";
 
+const errors = require("restify-errors");
+
 export class MonitoringResultService {
 
     public async list(userID: number): Promise<MonitoringResult[]> {
@@ -17,7 +19,7 @@ export class MonitoringResultService {
         return returnResults;
     }
 
-    public async getByName(name: string, userID: number): Promise<[number, MonitoringResult[]]> {
+    public async getByName(name: string, userID: number): Promise<MonitoringResult[]> {
         const endpoints = await getRepository(MonitoredEndpoint).find();
         let endpoint: MonitoredEndpoint;
         for (endpoint of endpoints) {
@@ -25,12 +27,11 @@ export class MonitoringResultService {
                 break;
             }
         }
-
-        let returnResults: MonitoringResult[] = [];
         if (! endpoint) {
-            return [404, returnResults];
+            throw new errors.NotFoundError();
         }
 
+        let returnResults: MonitoringResult[] = [];
         const results = await getRepository(MonitoringResult).find();
         results.forEach(result => {
             if (result.monitoredEndpoint.id === endpoint.id) {
@@ -40,18 +41,18 @@ export class MonitoringResultService {
 
         if (returnResults.length > 10) {
             returnResults.sort((l, r): number => {
-                if (l.date < r.date ) return -1;
-                if (l.date > r.date ) return 1;
+                if (l.date < r.date) return -1;
+                if (l.date > r.date) return 1;
                 return 0;
             });
 
             returnResults = returnResults.slice(returnResults.length - 10);
         }
 
-        return [200, returnResults];
+        return returnResults;
     }
 
-    public async create(req: Request, userID: number): Promise<[number, MonitoringResult]> {
+    public async create(req: Request, userID: number): Promise<MonitoringResult> {
         const match: string = (typeof req.body.name !== "undefined" && req.body.name) ? req.body.name : req.body.url;
         const endpoints = await getRepository(MonitoredEndpoint).find();
         let endpoint: MonitoredEndpoint;
@@ -64,39 +65,39 @@ export class MonitoringResultService {
         };
         const newMonitoringResult: MonitoringResult = new MonitoringResult();
         if (flag) {
-            return [500, newMonitoringResult];
+            throw new errors.BadRequestError();
         }
         if (endpoint.user.id !== userID) {
-            return [403, newMonitoringResult];
+            throw new errors.ForbiddenError();
         }
 
         newMonitoringResult.monitoredInterval = 0;
 
-        // tslint:disable: ter-indent
         request({
-              url : endpoint.url,
-              time : true,
-              method : endpoint.type,
-            },  async (err, res, body) => {
-              newMonitoringResult.statusCode = res.statusCode;
-              newMonitoringResult.returnedPlayload = body;
-              newMonitoringResult.monitoredInterval = Math.ceil(res.elapsedTime / 1000);
-            },
-        );
-        // tslint:enable: ter-indent
+            url : endpoint.url,
+            time : true,
+            method : endpoint.type
+        }, async (err, res, body) => {
+            newMonitoringResult.statusCode = res.statusCode;
+            newMonitoringResult.returnedPlayload = body;
+            newMonitoringResult.monitoredInterval = Math.ceil(res.elapsedTime / 1000);
+        });
+
         newMonitoringResult.monitoredEndpoint = endpoint;
         await this.wait(newMonitoringResult); // using sleep to wait for response
 
-        return [200, await getRepository(MonitoringResult).save(newMonitoringResult)];
+        return getRepository(MonitoringResult).save(newMonitoringResult);
     }
 
-    public async delete(id: number, userID: number): Promise<number> {
+    public async delete(id: number, userID: number): Promise<DeleteResult> {
         const entity = await getRepository(MonitoringResult).findOne(id);
-        if (entity.monitoredEndpoint.user.id !== userID) {
-            return 404;
+        if (! entity) {
+            throw new errors.NotFoundError();
         }
-        await getRepository(MonitoringResult).delete(id);
-        return 200;
+        if (entity.monitoredEndpoint.user.id !== userID) {
+            throw new errors.ForbiddenError();
+        }
+        return getRepository(MonitoringResult).delete(id);
     }
 
     private async wait(entity: MonitoringResult): Promise<void> {

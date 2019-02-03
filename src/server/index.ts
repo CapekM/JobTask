@@ -41,8 +41,7 @@ export class ApiServer implements HttpServer {
             try {
                 await requestHandler(req, res, next);
             } catch (e) {
-                console.log(e);
-                res.send(500, e);
+                res.send(e);
             }
         });
         // console.log(`Added route ${method.toUpperCase()} ${url}`);

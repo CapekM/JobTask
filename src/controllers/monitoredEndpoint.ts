@@ -22,7 +22,7 @@ export class MonitoredEndpointController implements Controller {
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        res.send( await endpointService.create(req.body, getUserID(req.headers.authorization)));
+        res.send(await endpointService.create(req.body, getUserID(req.headers.authorization)));
     }
 
     private async update(req: Request, res: Response): Promise<void> {
