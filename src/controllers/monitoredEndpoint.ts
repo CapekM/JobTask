@@ -18,25 +18,18 @@ export class MonitoredEndpointController implements Controller {
     }
 
     private async getById(req: Request, res: Response): Promise<void> {
-        const message = await endpointService.getById(req.params.id, getUserID(req.headers.authorization));
-        res.send(message[0], (message[0] === 200) ? message[1] : "");
+        res.send(await endpointService.getById(req.params.id, getUserID(req.headers.authorization)));
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        const entity = await endpointService.create(req.body, getUserID(req.headers.authorization));
-        res.send(entity ? 200 : 404, entity);
+        res.send( await endpointService.create(req.body, getUserID(req.headers.authorization)));
     }
 
     private async update(req: Request, res: Response): Promise<void> {
-        const message = await endpointService.update({ ...req.body, id: req.params.id }, getUserID(req.headers.authorization));
-        res.send(message[0], (message[0] === 200) ? message[1] : "");
+        res.send(await endpointService.update({ ...req.body, id: req.params.id }, getUserID(req.headers.authorization)));
     }
 
     private async remove(req: Request, res: Response): Promise<void> {
-        try {
-            res.send(await endpointService.delete(req.params.id, getUserID(req.headers.authorization)));
-        } catch (e) {
-            res.send(500);
-        }
+        res.send(await endpointService.delete(req.params.id, getUserID(req.headers.authorization)));
     }
 }

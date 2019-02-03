@@ -2,6 +2,8 @@ import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
 import { getRepository } from "typeorm";
 import { User } from "../entity/User";
 
+const errors = require('restify-errors');
+
 export class MonitoredEndpointService {
 
     public async list(userID: number): Promise<MonitoredEndpoint[]> {
@@ -15,18 +17,21 @@ export class MonitoredEndpointService {
         return returnEndpoints;
     }
 
-    public async getById(id: number, userID: number): Promise<[number, MonitoredEndpoint]> {
+    public async getById(id: number, userID: number): Promise<MonitoredEndpoint> {
         const entity = await getRepository(MonitoredEndpoint).findOne(id);
-        if ( (! entity) || (entity.user.id !== userID) ) {
-            return [404, entity];
+        if (! entity) {
+            return new errors.NotFoundError();
         }
-        return [200, entity];
+        if (entity.user.id !== userID) {
+            return new errors.ForbiddenError();
+        }
+        return entity;
     }
 
     public async create(entity: MonitoredEndpoint, userID: number): Promise<MonitoredEndpoint> {
         // Normally DTO !== DB-Entity, so we "simulate" a mapping of both
         if (entity.name === "" || entity.url === "") {
-            return null;
+            return new errors.BadRequestError();
         }
         const newEndpoint = new MonitoredEndpoint();
         newEndpoint.name = entity.name;
@@ -35,10 +40,16 @@ export class MonitoredEndpointService {
         return getRepository(MonitoredEndpoint).save(newEndpoint);
     }
 
-    public async update(entity: MonitoredEndpoint, userID: number): Promise<[number, MonitoredEndpoint]> {
+    public async update(entity: MonitoredEndpoint, userID: number): Promise<MonitoredEndpoint> {
         const updatedEntity = await getRepository(MonitoredEndpoint).findOne(entity.id);
-        if ( (! entity) || (updatedEntity.user.id !== userID) ) {
-            return [404, updatedEntity];
+        if (! entity) {
+            return new errors.BadRequestError();
+        }
+        if (! updatedEntity) {
+            return new errors.NotFoundError();
+        }
+        if (updatedEntity.user.id !== userID) {
+            return new errors.ForbiddenError();
         }
         if (entity.name) {
             updatedEntity.name = entity.name;
@@ -50,13 +61,16 @@ export class MonitoredEndpointService {
             updatedEntity.type = entity.type;
         }
         await getRepository(MonitoredEndpoint).save(updatedEntity);
-        return [200, updatedEntity];
+        return updatedEntity;
     }
 
     public async delete(id: number, userID: number): Promise<number> {
         const entity = await getRepository(MonitoredEndpoint).findOne(id);
+        if (! entity) {
+            return new errors.NotFoundError();
+        }
         if (entity.user.id !== userID) {
-            return 404;
+            return new errors.ForbiddenError();
         }
         await getRepository(MonitoredEndpoint).delete(id);
         return 200;

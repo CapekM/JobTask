@@ -177,7 +177,7 @@ describe( "Test API", () => {
                 .delete( "/endpoint/" + endpointID )
                 .set("Authorization", userB)
                 .end( ( err, res ) => {
-                    expect( res ).to.have.status( 404 );
+                    expect( res ).to.have.status( 403 );
                 });
             });
 
@@ -196,7 +196,7 @@ describe( "Test API", () => {
                 .delete( "/endpoint/" + endpointID )
                 .set("Authorization", userA)
                 .end( ( err, res ) => {
-                    expect( res ).to.have.status( 500 );
+                    expect( res ).to.have.status( 404 );
                     done();
                 });
             });

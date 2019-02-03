@@ -1,12 +1,12 @@
-# Project to monitor endpoints
+# Endpoints monitoring service
 
 ##  Prepare database
 - Setup database settings inside `ormconfig.json` file
 - I used docker like this:
 
-	 1. `docker run --name db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=a4s5d6 mysql`
-	 2. `docker exec -it db mysql -u root -p`
-	 3. `create database justTest;`
+	1. `docker run --name db -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=a4s5d6 mysql`
+	2. `docker exec -it db mysql -u root -p`
+	3. `create database justTest;`
 		>I got ER_NOT_SUPPORTED_AUTH_MODE when running app.
 		>You can check auth mode with `SELECT plugin FROM mysql.user WHERE User = 'root';`
 		>and change it with `ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'a4s5d6';`
