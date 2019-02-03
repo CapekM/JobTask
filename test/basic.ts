@@ -10,7 +10,6 @@ import { createConnection, Connection, Repository, getRepository } from "typeorm
 import { after, before } from "mocha";
 import { MonitoredEndpoint } from "../src/entity/MonitoredEndpoint";
 import { MonitoringResult } from "../src/entity/MonitoringResult";
-require("dotenv").config();
 
 chai.use( chaiHttp );
 
@@ -74,6 +73,17 @@ describe( "Test API", () => {
     describe( "MonitoredEndpoints tests", () => {
         let endpointID: number;
 
+        it( "Ping", done => {
+            chai.request( server.server )
+            .get( "/ping" )
+            .end( ( err, res ) => {
+                expect( res ).to.have.status( 200 );
+                expect( res.body ).to.have.eql( "hello" );
+                expect( res.body.length ).to.have.eql( 5 );
+                done();
+            });
+        });
+
         it( "UserA get token", done => {
             chai.request( server.server )
             .post( "/auth" )
@@ -84,15 +94,7 @@ describe( "Test API", () => {
                 expect( res ).to.have.status( 200 );
                 expect(res.body).to.have.property("token");
                 userA = `Bearer ${res.body.token}`;
-                chai.request( server.server )
-                .get( "/ping" )
-                .set("Authorization", userA)
-                .end( ( err, res ) => {
-                    expect( res ).to.have.status( 200 );
-                    expect( res.body ).to.have.eql( "hello" );
-                    expect( res.body.length ).to.have.eql( 5 );
-                    done();
-                });
+                done();
             });
         });
 
@@ -106,15 +108,7 @@ describe( "Test API", () => {
                 expect( res ).to.have.status( 200 );
                 expect(res.body).to.have.property("token");
                 userB = `Bearer ${res.body.token}`;
-                chai.request( server.server )
-                .get( "/ping" )
-                .set("Authorization", userB)
-                .end( ( err, res ) => {
-                    expect( res ).to.have.status( 200 );
-                    expect( res.body ).to.have.eql( "hello" );
-                    expect( res.body.length ).to.have.eql( 5 );
-                    done();
-                });
+                done();
             });
         });
 
@@ -163,7 +157,7 @@ describe( "Test API", () => {
             });
 
             it( "PUT endpoint as userA", done => {
-                let newName = "Cool name"
+                const newName = "Cool name";
                 chai.request( server.server )
                 .put( "/endpoint/" + endpointID )
                 .set("Authorization", userA)
@@ -193,7 +187,7 @@ describe( "Test API", () => {
                 .set("Authorization", userA)
                 .end( ( err, res ) => {
                     expect( res ).to.have.status( 200 );
-                    done()
+                    done();
                 });
             });
 
@@ -217,8 +211,8 @@ describe( "Test API", () => {
                 .post( "/endpoint" )
                 .set("Authorization", userA)
                 .send({
-                    name: name,
-                    url: url,
+                    name,
+                    url,
                 })
                 .end( ( err, res ) => {
                     expect( res ).to.have.status( 200 );
@@ -226,15 +220,14 @@ describe( "Test API", () => {
                 });
             });
 
-
             describe( "Make 12 results", () => {
-                for( let i = 12; i > 0; i--) {
+                for ( let i = 12; i > 0; i--) {
                     it( "POST result as userA", done => {
                         chai.request( server.server )
                         .post( "/result" )
                         .set("Authorization", userA)
                         .send({
-                            name: name
+                            name,
                         })
                         .end( ( err, res ) => {
                             expect( res ).to.have.status( 200 );
@@ -278,7 +271,7 @@ describe( "Test API", () => {
                     });
                 });
 
-                it( "GET results from " + name + " as userA", done => {
+                it( `GET results from ${name} as userA`, done => {
                     chai.request( server.server )
                     .get( "/results/" + name )
                     .set("Authorization", userA)

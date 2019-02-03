@@ -2,9 +2,8 @@ import { HttpServer } from "./httpServer";
 import * as restify from "restify";
 // tslint:disable-next-line: no-duplicate-imports
 import { RequestHandler, Server } from "restify";
-import { CONTROLLERS } from "../controllers/index";
+import { CONTROLLERS } from "../controllers/controller";
 import * as rjwt from "restify-jwt-community";
-var unless = require('express-unless');
 require("dotenv").config();
 
 export class ApiServer implements HttpServer {
@@ -31,14 +30,13 @@ export class ApiServer implements HttpServer {
         this.server.use(restify.plugins.queryParser());
         this.server.use(restify.plugins.bodyParser());
         this.server.use(restify.plugins.authorizationParser());
-        this.server.use(rjwt({ secret: process.env.JWT_SECRET}).unless({path: ['/auth']}));
+        this.server.use(rjwt({ secret: process.env.JWT_SECRET }).unless({ path: ["/auth", "/ping"] }));
         this.addControllers();
 
         this.server.listen(port);
         console.log(`Server is up & running on port ${port}`);
     }
 
-// tslint:disable-next-line: max-line-length
     private addRoute(method: "get" | "post" | "put" | "del", url: string, requestHandler: RequestHandler): void {
         this.server[method](url, async (req, res, next) => {
             try {

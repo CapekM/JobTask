@@ -3,7 +3,7 @@ import { createConnection } from "typeorm";
 import { ApiServer } from "./server/index";
 import { createBasicUsers } from "./entity/User";
 
-createConnection().then(async (connection) => {
+createConnection().then(async () => {
     await createBasicUsers()    ;
     const server = new ApiServer();
     server.start(+process.env.PORT || 8080);

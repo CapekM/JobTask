@@ -1,8 +1,6 @@
 import {Controller} from "./controller";
 import {HttpServer} from "../server/httpServer";
 import {Request, Response} from "restify";
-import { getRepository } from "typeorm";
-import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
 import { monitoringResultService } from "../services/monitoringResult";
 import { getUserID } from "../services/auth";
 
@@ -24,27 +22,8 @@ export class MonitoreingResultController implements Controller {
     }
 
     private async create(req: Request, res: Response): Promise<void> {
-        const match: string = (typeof req.body.name !== "undefined" && req.body.name)
-        ? req.body.name : req.body.url;
-        const endpoints = await getRepository(MonitoredEndpoint).find();
-        let entity: MonitoredEndpoint;
-        let flag: boolean = true;
-        endpoints.forEach(endpoint => {
-            if (endpoint.name === match ||
-                (endpoint.url === match && endpoint.type === req.body.type)) {
-                entity = endpoint;
-                flag = false;
-            }
-        });
-        if (flag) {
-            res.send(500);
-            return;
-        }
-        if (entity.user.id !== getUserID(req.headers.authorization)) {
-            res.send(403);
-            return;
-        }
-        res.send(await monitoringResultService.create(entity));
+        const message = await monitoringResultService.create(req, getUserID(req.headers.authorization));
+        res.send( (message[0] !== 200) ? message[0] : message[0], message[1]);
     }
 
     private async remove(req: Request, res: Response): Promise<void> {

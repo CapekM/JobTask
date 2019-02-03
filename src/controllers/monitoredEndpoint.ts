@@ -29,7 +29,7 @@ export class MonitoredEndpointController implements Controller {
     }
 
     private async update(req: Request, res: Response): Promise<void> {
-        const message = await endpointService.update({ ...req.body, id: req.params.id }, getUserID(req.headers.authorization))
+        const message = await endpointService.update({ ...req.body, id: req.params.id }, getUserID(req.headers.authorization));
         res.send(message[0], (message[0] === 200) ? message[1] : "");
     }
 

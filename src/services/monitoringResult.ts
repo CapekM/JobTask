@@ -2,6 +2,7 @@ import { getRepository, DeleteResult } from "typeorm";
 import { MonitoringResult } from "../entity/MonitoringResult";
 import { MonitoredEndpoint } from "../entity/MonitoredEndpoint";
 import * as request from "request";
+import { Request } from "restify";
 
 export class MonitoringResultService {
 
@@ -50,15 +51,32 @@ export class MonitoringResultService {
         return [200, returnResults];
     }
 
-    public async create(monitoredEndpoint: MonitoredEndpoint): Promise<MonitoringResult> {
+    public async create(req: Request, userID: number): Promise<[number, MonitoringResult]> {
+        const match: string = (typeof req.body.name !== "undefined" && req.body.name) ? req.body.name : req.body.url;
+        const endpoints = await getRepository(MonitoredEndpoint).find();
+        let endpoint: MonitoredEndpoint;
+        let flag: boolean = true;
+        for (endpoint of endpoints) {
+            if (endpoint.name === match || (endpoint.url === match && endpoint.type === req.body.type)) {
+                flag = false;
+                break;
+            }
+        };
         const newMonitoringResult: MonitoringResult = new MonitoringResult();
+        if (flag) {
+            return [500, newMonitoringResult];
+        }
+        if (endpoint.user.id !== userID) {
+            return [403, newMonitoringResult];
+        }
+
         newMonitoringResult.monitoredInterval = 0;
 
         // tslint:disable: ter-indent
         request({
-              url : monitoredEndpoint.url,
+              url : endpoint.url,
               time : true,
-              method : monitoredEndpoint.type,
+              method : endpoint.type,
             },  async (err, res, body) => {
               newMonitoringResult.statusCode = res.statusCode;
               newMonitoringResult.returnedPlayload = body;
@@ -66,10 +84,10 @@ export class MonitoringResultService {
             },
         );
         // tslint:enable: ter-indent
-        newMonitoringResult.monitoredEndpoint = monitoredEndpoint;
+        newMonitoringResult.monitoredEndpoint = endpoint;
         await this.wait(newMonitoringResult); // using sleep to wait for response
 
-        return getRepository(MonitoringResult).save(newMonitoringResult);
+        return [200, await getRepository(MonitoringResult).save(newMonitoringResult)];
     }
 
     public async delete(id: number, userID: number): Promise<number> {
