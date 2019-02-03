@@ -5,6 +5,7 @@
   "devDependencies": {
     "@types/jsonwebtoken": "^8.3.0",
     "@types/node": "^8.10.39",
+    "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
     "chai-http": "^4.2.1",
     "mocha": "^5.2.0",
@@ -28,7 +29,6 @@
     "typeorm": "^0.2.12"
   },
   "scripts": {
-    "devdep": "npm install typescript ts-node tslint typescript-tslint-plugin tslint-config-airbnb @types/node mocha chai chai-http --save-dev",
     "start": "ts-node src/index.ts",
     "test": "mocha --require ts-node/register test/**/*.ts",
     "dev": "nodemon src/index.ts"

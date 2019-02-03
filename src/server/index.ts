@@ -2,9 +2,8 @@ import { HttpServer } from "./httpServer";
 import * as restify from "restify";
 // tslint:disable-next-line: no-duplicate-imports
 import { RequestHandler, Server } from "restify";
-import { CONTROLLERS } from "../controllers/controller";
+import { controllers } from "../controllers/controller";
 import * as rjwt from "restify-jwt-community";
-require("dotenv").config();
 
 export class ApiServer implements HttpServer {
     public server: Server;
@@ -50,6 +49,6 @@ export class ApiServer implements HttpServer {
     }
 
     private addControllers(): void {
-        CONTROLLERS.forEach(controller => controller.initialize(this));
+        controllers.forEach(controller => controller.initialize(this));
     }
 }

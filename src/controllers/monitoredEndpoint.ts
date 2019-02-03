@@ -3,7 +3,6 @@ import { HttpServer } from "../server/httpServer";
 import { Request, Response } from "restify";
 import { endpointService } from "../services/monitoredEndpoint";
 import { getUserID } from "../services/auth";
-require("dotenv").config();
 
 export class MonitoredEndpointController implements Controller {
     public initialize(httpServer: HttpServer): void {

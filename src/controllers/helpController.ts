@@ -4,8 +4,6 @@ import { Request, Response } from "restify";
 import { authenticate } from "../services/auth";
 import * as jwt from "jsonwebtoken";
 
-require("dotenv").config();
-
 export class HelpController implements Controller {
     public initialize(httpServer: HttpServer): void {
         httpServer.get("ping", (req, res) => res.send(200, "hello"));
@@ -14,13 +12,9 @@ export class HelpController implements Controller {
 
     private async auth(req: Request, res: Response): Promise<void> {
         try {
-            const user = await authenticate(req.body.name);
-
-            const token = jwt.sign(JSON.parse(JSON.stringify(user)), process.env.JWT_SECRET, {
-                expiresIn: "1h",
-            });
+            const token = await authenticate(req.body.name);
             const decoded = jwt.decode(token);
-            res.send({decoded, token});
+            res.send({ decoded, token });
         } catch (err) {
             res.send("Invalid user");
         }

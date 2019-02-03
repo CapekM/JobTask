@@ -1,20 +1,22 @@
 import { User } from "../entity/User";
 import { getRepository } from "typeorm";
-import { Request } from "restify";
 import * as jwt from "jsonwebtoken";
 
-export async function authenticate(name: string): Promise<User> {
+export async function authenticate(name: string): Promise<string> {
     const users = await getRepository(User).find();
     let user = new User();
     users.forEach((tmp) => {
-        if ( tmp.username === name) {
+        if (tmp.username === name) {
             user = tmp;
         }
     });
-    if ( user.username === name) {
-        return user;
+    if (user.username !== name) {
+        return Promise.reject();
     }
-    return Promise.reject();
+
+    return  jwt.sign(JSON.parse(JSON.stringify(user)), process.env.JWT_SECRET, {
+        expiresIn: "1h",
+    });
 }
 
 export function getUserID(auth: string): number {

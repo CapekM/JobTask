@@ -1,6 +1,6 @@
-import {Controller} from "./controller";
-import {HttpServer} from "../server/httpServer";
-import {Request, Response} from "restify";
+import { Controller } from "./controller";
+import { HttpServer } from "../server/httpServer";
+import { Request, Response } from "restify";
 import { monitoringResultService } from "../services/monitoringResult";
 import { getUserID } from "../services/auth";
 
